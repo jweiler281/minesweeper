@@ -10,13 +10,13 @@ mines = 10
 #   - Pick unique mine locations within field -- done
 #   - Prompt user for coordinates of picks
 #   - Create list "array" of field -- done
-#   - Add notation for area within 1 square of mines
+#   - Add notation for area within 1 square of mines -- done
 #   - Determine status of mines
 #   - Determine what is within an 3x3 grid of whichever place is selected
 #       - Reveal all mines if cell is mined
 #       - Highlight cell with number if it's next to 1 or more mines
 #       - Clear cell and all adjacent non-mined cells if it's not next to a mine
-#   - Set up TDD
+#   - Update TO DO list
 
 def setup():
     # Initial config of the game dimensions and number of mines
@@ -67,6 +67,7 @@ def mine_setup():
     return mine_loc
 
 def guess():
+# Takes player's guesses
     gx_ready = False
     # Validator of whether x value is within constraints
     gy_ready = False
@@ -93,7 +94,7 @@ def guess():
         guess()
 
 def start_field():
-# Start troubleshooting here, will create dim x dim list and will put some of the mines into it
+# Creates field to track mines, squares, and guesses
     global field
     # Tracks status of field and mines
     mine_symbol = 0
@@ -108,26 +109,35 @@ def start_field():
     return field_pretty()
 
 def field_pretty():
+# Prints field in more pretty grid
     global field
-    field_output = ""
+    header_row = list(range(1, dim + 1))
+    field_output = "C:  " + str(header_row) + "\n"
     for i in range(dim):
-        field_output = field_output + str(i + 1) + ": " + str(field[i]) + "\n"
+        field_output = field_output + "R" + str(i + 1) + ": " + str(field[i]) + "\n"
     return field_output
 
 def aligner():
     # Annotates squares 1 space from mines
     global field
     i = j = 0
-    while i != dim - 1:
+    while i != dim:
+    # Iterates through y axis
         y_counter = i
         j = 0
         while j != dim:
+        # Iterates through x axis
             neighbors = [False, False, False, False, False, False, False, False]
+            # Tracks which neighbor squares are mined
+            # 0  1  2
+            # 7  s  3
+            # 6  5  4
             square_sum = 0
+            # Number to set for square based on mined neighbors
             if field[y_counter][j] == 0:
-                print("#0 i: " + str(i) + "\n" + "j: " + str(j))
+            # Ignores square if mined
+                neighbors[0] = False
             elif i == 0 and j == 0: # Top left corner
-                print("#1 i: " + str(i) + "\n" + "j: " + str(j))
                 if field[y_counter][j + 1] == 0:
                     neighbors[3] = True
                 if field[y_counter + 1][j + 1] == 0:
@@ -135,7 +145,6 @@ def aligner():
                 if field[y_counter + 1][j] == 0:
                     neighbors[5] = True
             elif i == 0 and j == (dim - 1): # Top right corner
-                print("#2 i: " + str(i) + "\n" + "j: " + str(j))
                 if field[y_counter][j - 1] == 0:
                     neighbors[7] = True
                 if field[y_counter + 1][j - 1] == 0:
@@ -143,7 +152,6 @@ def aligner():
                 if field[y_counter + 1][j] == 0:
                     neighbors[5] = True
             elif i == 0: # Top row minus corners
-                print("#3 i: " + str(i) + "\n" + "j: " + str(j))
                 if field[y_counter][j - 1] == 0:
                     neighbors[7] = True
                 if field[y_counter + 1][j - 1] == 0:
@@ -154,8 +162,32 @@ def aligner():
                     neighbors[4] = True
                 if field[y_counter][j + 1] == 0:
                     neighbors[3] = True
+            elif i == (dim - 1) and j == 0: # Bottom left corner
+                if field[y_counter - 1][j] == 0:
+                    neighbors[1] = True
+                if field[y_counter - 1][j + 1] == 0:
+                    neighbors[2] = True
+                if field[y_counter][j + 1] == 0:
+                    neighbors[3] = True
+            elif i == (dim - 1) and j == (dim - 1): # Bottom right corner
+                if field[y_counter][j - 1] == 0:
+                    neighbors[7] = True
+                if field[y_counter - 1][j - 1] == 0:
+                    neighbors[0] = True
+                if field[y_counter - 1][j] == 0:
+                    neighbors[1] = True
+            elif i == (dim - 1): # Bottom row minus corners
+                if field[y_counter][j - 1] == 0:
+                    neighbors[7] = True
+                if field[y_counter - 1][j - 1] == 0:
+                    neighbors[0] = True
+                if field[y_counter - 1][j] == 0:
+                    neighbors[1] = True
+                if field[y_counter - 1][j + 1] == 0:
+                    neighbors[2] = True
+                if field[y_counter][j + 1] == 0:
+                    neighbors[3] = True            
             elif j == 0: # Left column minus corners
-                print("#4 i: " + str(i) + "\n" + "j: " + str(j))
                 if field[y_counter - 1][j] == 0:
                     neighbors[1] = True
                 if field[y_counter - 1][j + 1] == 0:
@@ -167,7 +199,6 @@ def aligner():
                 if field[y_counter + 1][j] == 0:
                         neighbors[5] = True
             elif j == (dim - 1): # Right column minus corners
-                print("#5 i: " + str(i) + "\n" + "j: " + str(j))
                 if field[y_counter - 1][j] == 0:
                     neighbors[1] = True
                 if field[y_counter - 1][j - 1] == 0:
@@ -178,36 +209,7 @@ def aligner():
                     neighbors[6] = True
                 if field[y_counter + 1][j] == 0:
                     neighbors[5] = True
-            elif i == (dim - 1) and j == 0: # Bottom left corner
-                print("#6 i: " + str(i) + "\n" + "j: " + str(j))
-                if field[y_counter - 1][j] == 0:
-                    neighbors[1] = True
-                if field[y_counter - 1][j + 1] == 0:
-                    neighbors[2] = True
-                if field[y_counter][j + 1] == 0:
-                    neighbors[3] = True
-            elif i == (dim - 1) and j == (dim - 1): # Bottom right corner
-                print("#7 i: " + str(i) + "\n" + "j: " + str(j))
-                if field[y_counter][j - 1] == 0:
-                    neighbors[7] = True
-                if field[y_counter - 1][j - 1] == 0:
-                    neighbors[0] = True
-                if field[y_counter - 1][j] == 0:
-                    neighbors[1] = True
-            elif i == (dim - 1): # Bottom row minus corners
-                print("#8 i: " + str(i) + "\n" + "j: " + str(j))
-                if field[y_counter][j - 1] == 0:
-                    neighbors[7] = True
-                if field[y_counter - 1][j - 1] == 0:
-                    neighbors[0] = True
-                if field[y_counter - 1][j] == 0:
-                    neighbors[1] = True
-                if field[y_counter - 1][j + 1] == 0:
-                    neighbors[2] = True
-                if field[y_counter][j + 1] == 0:
-                    neighbors[3] = True
-            else:
-                print("#9 i: " + str(i) + "\n" + "j: " + str(j))
+            else: # All middle squares
                 if field[y_counter][j - 1] == 0:
                     neighbors[7] = True
                 if field[y_counter - 1][j - 1] == 0:
@@ -225,6 +227,7 @@ def aligner():
                 if field[y_counter + 1][j - 1] == 0:
                     neighbors[6] = True
             if True in neighbors:
+            # Counting up how many neighbors are mined
                 for item in neighbors:
                     if item == True:
                         square_sum += 1
@@ -233,13 +236,12 @@ def aligner():
         i += 1
 
 
-
+def tester():
+    setup()
+    mine_setup()
+    start_field()
+    aligner()
+    print(field_pretty())
 
    
-
-setup()
-dog = mine_setup()
-print(dog)
-print(start_field())
-aligner()
-print(field_pretty())
+print(tester())
