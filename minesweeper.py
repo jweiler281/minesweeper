@@ -74,14 +74,14 @@ def guess():
     # Validator of whether y value is within constraints
     gx = int(input("What is your next guess X-axis component?: ")) - 1
     # Receive input on x component
-    if gx < 0 or gx == (dim):
+    if gx < 0 or gx >= (dim):
     # Validate x component is within constraints
         gx_ready = False
     else:
         gx_ready = True
     gy = int(input("What is your next guess Y-axis component?: ")) - 1
     # Receive input on y component
-    if gy < 0 or gy == (dim):
+    if gy < 0 or gy >= (dim):
     # Validate y component is within constraints
         gy_ready = False
     else:
@@ -91,7 +91,7 @@ def guess():
         return (gx, gy)
     else:
     # If x/y components not within constraints, recurse to try again
-        guess()
+        return (-1)
 
 def start_field():
 # Creates field to track mines, squares, and guesses
@@ -99,11 +99,12 @@ def start_field():
     # Tracks status of field and mines
     mine_symbol = 0
     # Annotates mine on field
-    field = [[-1] * (len(range(dim))) for i in range(dim)]
+    field = [[[-1,0] for k in range(dim)] for j in range(dim)]
     # Creates field with [[dim]dim] nested list
+    # [-1(not mined) or 0(mined) or 1+(how many mined neighbors), 0(not visible) or 1(visible to player)]
     counter = 0
     while counter != (mines):
-        field[int(mine_loc[counter][1]) - 1][int(mine_loc[counter][0]) - 1] = mine_symbol
+        field[int(mine_loc[counter][1]) - 1][int(mine_loc[counter][0]) - 1][0] = mine_symbol
         # Sets mine locations to 0 -- field[y][x]
         counter += 1
     return field_pretty()
@@ -134,114 +135,163 @@ def aligner():
             # 6  5  4
             square_sum = 0
             # Number to set for square based on mined neighbors
-            if field[y_counter][j] == 0:
+            if field[y_counter][j][0] == 0:
             # Ignores square if mined
                 neighbors[0] = False
             elif i == 0 and j == 0: # Top left corner
-                if field[y_counter][j + 1] == 0:
+                if field[y_counter][j + 1][0] == 0:
                     neighbors[3] = True
-                if field[y_counter + 1][j + 1] == 0:
+                if field[y_counter + 1][j + 1][0] == 0:
                     neighbors[4] = True
-                if field[y_counter + 1][j] == 0:
+                if field[y_counter + 1][j][0] == 0:
                     neighbors[5] = True
             elif i == 0 and j == (dim - 1): # Top right corner
-                if field[y_counter][j - 1] == 0:
+                if field[y_counter][j - 1][0] == 0:
                     neighbors[7] = True
-                if field[y_counter + 1][j - 1] == 0:
+                if field[y_counter + 1][j - 1][0] == 0:
                     neighbors[6] = True
-                if field[y_counter + 1][j] == 0:
+                if field[y_counter + 1][j][0] == 0:
                     neighbors[5] = True
             elif i == 0: # Top row minus corners
-                if field[y_counter][j - 1] == 0:
+                if field[y_counter][j - 1][0] == 0:
                     neighbors[7] = True
-                if field[y_counter + 1][j - 1] == 0:
+                if field[y_counter + 1][j - 1][0] == 0:
                     neighbors[6] = True
-                if field[y_counter + 1][j] == 0:
+                if field[y_counter + 1][j][0] == 0:
                     neighbors[5] = True
-                if field[y_counter + 1][ j + 1] == 0:
+                if field[y_counter + 1][ j + 1][0] == 0:
                     neighbors[4] = True
-                if field[y_counter][j + 1] == 0:
+                if field[y_counter][j + 1][0] == 0:
                     neighbors[3] = True
             elif i == (dim - 1) and j == 0: # Bottom left corner
-                if field[y_counter - 1][j] == 0:
+                if field[y_counter - 1][j][0] == 0:
                     neighbors[1] = True
-                if field[y_counter - 1][j + 1] == 0:
+                if field[y_counter - 1][j + 1][0] == 0:
                     neighbors[2] = True
-                if field[y_counter][j + 1] == 0:
+                if field[y_counter][j + 1][0] == 0:
                     neighbors[3] = True
             elif i == (dim - 1) and j == (dim - 1): # Bottom right corner
-                if field[y_counter][j - 1] == 0:
+                if field[y_counter][j - 1][0] == 0:
                     neighbors[7] = True
-                if field[y_counter - 1][j - 1] == 0:
+                if field[y_counter - 1][j - 1][0] == 0:
                     neighbors[0] = True
-                if field[y_counter - 1][j] == 0:
+                if field[y_counter - 1][j][0] == 0:
                     neighbors[1] = True
             elif i == (dim - 1): # Bottom row minus corners
-                if field[y_counter][j - 1] == 0:
+                if field[y_counter][j - 1][0] == 0:
                     neighbors[7] = True
-                if field[y_counter - 1][j - 1] == 0:
+                if field[y_counter - 1][j - 1][0] == 0:
                     neighbors[0] = True
-                if field[y_counter - 1][j] == 0:
+                if field[y_counter - 1][j][0] == 0:
                     neighbors[1] = True
-                if field[y_counter - 1][j + 1] == 0:
+                if field[y_counter - 1][j + 1][0] == 0:
                     neighbors[2] = True
-                if field[y_counter][j + 1] == 0:
+                if field[y_counter][j + 1][0] == 0:
                     neighbors[3] = True            
             elif j == 0: # Left column minus corners
-                if field[y_counter - 1][j] == 0:
+                if field[y_counter - 1][j][0] == 0:
                     neighbors[1] = True
-                if field[y_counter - 1][j + 1] == 0:
+                if field[y_counter - 1][j + 1][0] == 0:
                     neighbors[2] = True
-                if field[y_counter][j + 1] == 0:
+                if field[y_counter][j + 1][0] == 0:
                     neighbors[3] = True
-                if field[y_counter + 1][j + 1] == 0:
+                if field[y_counter + 1][j + 1][0] == 0:
                     neighbors[4] = True
-                if field[y_counter + 1][j] == 0:
+                if field[y_counter + 1][j][0] == 0:
                         neighbors[5] = True
             elif j == (dim - 1): # Right column minus corners
-                if field[y_counter - 1][j] == 0:
+                if field[y_counter - 1][j][0] == 0:
                     neighbors[1] = True
-                if field[y_counter - 1][j - 1] == 0:
+                if field[y_counter - 1][j - 1][0] == 0:
                     neighbors[0] = True
-                if field[y_counter][j - 1] == 0:
+                if field[y_counter][j - 1][0] == 0:
                     neighbors[7] = True
-                if field[y_counter + 1][j - 1] == 0:
+                if field[y_counter + 1][j - 1][0] == 0:
                     neighbors[6] = True
-                if field[y_counter + 1][j] == 0:
+                if field[y_counter + 1][j][0] == 0:
                     neighbors[5] = True
             else: # All middle squares
-                if field[y_counter][j - 1] == 0:
+                if field[y_counter][j - 1][0] == 0:
                     neighbors[7] = True
-                if field[y_counter - 1][j - 1] == 0:
+                if field[y_counter - 1][j - 1][0] == 0:
                     neighbors[0] = True
-                if field[y_counter - 1][j] == 0:
+                if field[y_counter - 1][j][0] == 0:
                     neighbors[1] = True
-                if field[y_counter - 1][j + 1] == 0:
+                if field[y_counter - 1][j + 1][0] == 0:
                     neighbors[2] = True
-                if field[y_counter][j + 1] == 0:
+                if field[y_counter][j + 1][0] == 0:
                     neighbors[3] = True
-                if field[y_counter + 1][j + 1] == 0:
+                if field[y_counter + 1][j + 1][0] == 0:
                     neighbors[4] = True
-                if field[y_counter + 1][j] == 0:
+                if field[y_counter + 1][j][0] == 0:
                     neighbors[5] = True
-                if field[y_counter + 1][j - 1] == 0:
+                if field[y_counter + 1][j - 1][0] == 0:
                     neighbors[6] = True
             if True in neighbors:
             # Counting up how many neighbors are mined
                 for item in neighbors:
                     if item == True:
                         square_sum += 1
-                field[y_counter][j] = square_sum
+                field[y_counter][j][0] = square_sum
             j += 1
         i += 1
 
+def print_current_field():
+    display_field = "     "
+    for i in range(dim): # Header row
+        if i == (dim - 1):
+            display_field = display_field + " " + str(i + 1)
+        else:
+            display_field = display_field + " " + str(i + 1) + " -"
+    display_field = display_field + "\n"
+    for j in range(dim): # Left coord column
+        if j == 9:
+            display_field = display_field + str(j + 1) + ": |"
+        else:
+            display_field = display_field + str(j + 1) + ":  |"
+        for k in range(dim): # Main body
+            if field[k][j][1] == 0:
+                display_field = display_field + " X |"
+            elif field[k][j][0] == -1 and field[k][j][1] == 1:
+                display_field = display_field + " - |"
+            elif field[k][j][0] == 0 and field[k][j][1] == 1:
+                display_field = display_field + " * |"
+            else:
+                display_field = display_field + " " + str(field[k][j][0]) + " |"
+        display_field = display_field + "\n"
+    return display_field
 
-def tester():
+
+def play_game():
+    global field
+    current_guess = ()
+    kaboom = False
+    win = False
     setup()
     mine_setup()
     start_field()
     aligner()
-    print(field_pretty())
+    print(print_current_field())
+    while win == False and kaboom == False:
+        current_guess = guess()
+        if current_guess == (-1):
+            print("Your guess coordinates must be 1 - " + str(dim) + ", try again.")
+            continue
+        else:
+            print("Your guess was: " + str(current_guess[0] + 1) + "," + str(current_guess[1] + 1) + "\n")
+            print(print_current_field())
+
+
+
+
+#def tester():
+#    setup()
+#    mine_setup()
+#    start_field()
+#    aligner()
+#    field_pretty()
+#    print(print_current_field())
 
    
-print(tester())
+#print(tester())
+play_game()
