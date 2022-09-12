@@ -1,4 +1,5 @@
 import random
+import pprint
 mine_loc = []
 field = []
 dim = 10
@@ -261,26 +262,80 @@ def print_current_field():
         display_field = display_field + "\n"
     return display_field
 
+def kaboomer():
+# Mushroom cloud graphic
+    boomer ="      _ ._  _ , _ ._ \n" + \
+            "    (_ ' ( `  )_  .__) \n" + \
+            "  ( (  (    )   `)  ) _) \n" + \
+            " (__ (_   (_ . _) _) ,__) \n" + \
+            "     `~~`\ ' . /`~~` \n" + \
+            "          ;   ; \n" + \
+            "          /   \ \n" + \
+            "    _____/_ __ \_____    \n" + \
+            "        KABOOM!!!          "
+
+    return boomer
+
+def reveal_field():
+# Turns entire field visible
+    global field
+    for i in range(dim):
+        for j in range(dim):
+            field[i][j][1] = 1
+    return
+
+def contiguous():
+    # Placeholder
+    # TO DO: Turn all contiguous non-mined squares visible
+    return "Contiguous"
+
+def reveal_square(y,x):
+# Marks square as visible
+    field[y][x][1] = 1
+    return
 
 def play_game():
     global field
+    global mine_loc
     current_guess = ()
     kaboom = False
     win = False
     setup()
-    mine_setup()
+    print(mine_setup()) # print is for testing
     start_field()
     aligner()
     print(print_current_field())
     while win == False and kaboom == False:
         current_guess = guess()
+        remaining = []
         if current_guess == (-1):
             print("Your guess coordinates must be 1 - " + str(dim) + ", try again.")
             continue
         else:
             print("Your guess was: " + str(current_guess[0] + 1) + "," + str(current_guess[1] + 1) + "\n")
-            print(print_current_field())
-
+            if field[current_guess[1]][current_guess[0]][0] == 0:
+                kaboom = True
+                print(kaboomer())
+                reveal_field()
+                print(print_current_field())
+            elif field[current_guess[1]][current_guess[0]][0] == -1:
+                reveal_square(current_guess[1],current_guess[0]) # testing only
+                #print(contiguous())
+                print(print_current_field())
+            else:
+                reveal_square(current_guess[1],current_guess[0])
+                print(print_current_field())
+            # Start work here, trying to figure out how to determine the win
+            for i in range(dim):
+                for j in range(dim):
+                    if field[i][j][1] == 0:
+                        remaining.append([field[j], field[i]])
+            if remaining == mine_loc:
+                win == True
+    if win == True:
+        print("YOU WIN!")
+    if kaboom == True:
+        print("YOU LOSE!")
 
 
 
