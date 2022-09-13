@@ -73,23 +73,23 @@ def guess():
     # Validator of whether x value is within constraints
     gy_ready = False
     # Validator of whether y value is within constraints
-    gx = int(input("What is your next guess X-axis component?: ")) - 1
-    # Receive input on x component
-    if gx < 0 or gx >= (dim):
-    # Validate x component is within constraints
-        gx_ready = False
-    else:
-        gx_ready = True
     gy = int(input("What is your next guess Y-axis component?: ")) - 1
-    # Receive input on y component
+    # Receive input on x component
     if gy < 0 or gy >= (dim):
-    # Validate y component is within constraints
+    # Validate x component is within constraints
         gy_ready = False
     else:
         gy_ready = True
+    gx = int(input("What is your next guess X-axis component?: ")) - 1
+    # Receive input on y component
+    if gx < 0 or gx >= (dim):
+    # Validate y component is within constraints
+        gx_ready = False
+    else:
+        gx_ready = True
     if gx_ready == True and gy_ready == True:
     # If x/y components within constraints, return (x, y) tuple
-        return (gx, gy)
+        return (gy, gx)
     else:
     # If x/y components not within constraints, recurse to try again
         return (-1)
@@ -284,13 +284,55 @@ def reveal_field():
             field[i][j][1] = 1
     return
 
-def contiguous():
-    # Placeholder
-    # TO DO: Turn all contiguous non-mined squares visible
-    return "Contiguous"
+def contiguous(y,x):
+# Turn all contiguous non-mined squares visible
+    global field
+    if field[y][x][1] == 1:
+        return
+    else:
+        reveal_square(y,x)
+    limits = list(range(0, dim))
+    if (x - 1) in limits and \
+    field[y][x - 1][0] == -1 and \
+    field[y][x - 1][1] == 0: # x - 1
+        contiguous(y,x - 1)
+    if (x - 1) in limits and \
+    (y - 1) in limits and \
+    field[y][x - 1][0] == -1 and \
+    field[y][x - 1][1] == 0: # x - 1, y - 1
+        contiguous(y - 1,x - 1)
+    if (y - 1) in limits and \
+    field[y - 1][x][0] == -1 and \
+    field[y - 1][x][1] == 0: # y - 1
+        contiguous(y - 1, x)
+    if (x + 1) in limits and \
+    (y - 1) in limits and \
+    field[y - 1][x + 1][0] == -1 and \
+    field[y - 1][x + 1][1] == 0: #
+        contiguous(y - 1,x + 1)
+    if (x + 1) in limits and \
+    field[y][x + 1][0] == -1 and \
+    field[y][x + 1][1] == 0:
+        contiguous(y,x + 1)
+    if (x + 1) in limits and \
+    (y + 1) in limits and \
+    field[y + 1][x + 1][0] == -1 and \
+    field[y + 1][x + 1][1] == 0:
+        contiguous(y + 1,x + 1)
+    if (y + 1) in limits and \
+    field[y + 1][x][0] == -1 and \
+    field[y + 1][x][1] == 0:
+        contiguous(y + 1, x)
+    if (x - 1) in limits and \
+    (y + 1) in limits and \
+    field[y + 1][x - 1][0] == -1 and \
+    field[y + 1][x - 1][1] == 0:
+        contiguous(y + 1, x - 1)
+    return
 
 def reveal_square(y,x):
 # Marks square as visible
+    global field
     field[y][x][1] = 1
     return
 
@@ -301,7 +343,6 @@ def play_game():
     kaboom = False
     win = False
     setup()
-    print(mine_setup()) # print is for testing
     start_field()
     aligner()
     print(print_current_field())
@@ -319,8 +360,7 @@ def play_game():
                 reveal_field()
                 print(print_current_field())
             elif field[current_guess[1]][current_guess[0]][0] == -1:
-                reveal_square(current_guess[1],current_guess[0]) # testing only
-                #print(contiguous())
+                contiguous(current_guess[1],current_guess[0])
                 print(print_current_field())
             else:
                 reveal_square(current_guess[1],current_guess[0])
